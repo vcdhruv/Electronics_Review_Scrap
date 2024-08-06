@@ -11,7 +11,11 @@ logging.basicConfig(
     filename="scrapper.log",
     level=logging.DEBUG,
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s - %(funcName)s - %(lineno)d",
-    datefmt="%Y-%M-%d %H:%M:%S"
+    datefmt="%Y-%M-%d %H:%M:%S",
+    handlers=[
+        logging.FileHandler("scrapper.log"),
+        logging.StreamHandler()
+    ]
 )
 site_url = "https://www.flipkart.com"
 base_url = "https://www.flipkart.com/search?q="
