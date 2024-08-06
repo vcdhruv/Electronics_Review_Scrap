@@ -46,7 +46,7 @@ def review():
 
             if main_url_res.status_code != 200:
                 logging.error(f"Failed to fetch main url : {main_url}")
-                return "Error : Failed to fetch search results from Flipkart",500
+                # return "Error : Failed to fetch search results from Flipkart",500
 
             soup = BeautifulSoup(main_url_res.text,"html.parser")
             soup.find_all("div",{"class":"cPHDOP col-12-12"})
