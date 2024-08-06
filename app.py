@@ -54,7 +54,7 @@ def review():
             bigbox = soup.find_all("div",{"class":"cPHDOP col-12-12"})
             if len(bigbox) < 3:
                 logging.error("Not enough records found on the search page.")
-                return "Error: Not enough products found",404
+                # return "Error: Not enough products found",404
             
             del bigbox[0:2]
             go_to_particular_page_links = []
@@ -75,7 +75,7 @@ def review():
             # logging.info(f"Response of {product_link} is {product_link_res}")
             if product_link_res.status_code != 200:
                 logging.error(f"Failed to fetch product page : {product_link}")
-                return "Error : Failed to fetch product page",500
+                # return "Error : Failed to fetch product page",500
             
                         
             mobile_soup = BeautifulSoup(product_link_res.text,"html.parser")
