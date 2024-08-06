@@ -1,0 +1,17 @@
+
+body{
+    background-color: aqua !important;
+}
+
+.head_section{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 10px;
+}
+
+.design_table{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
