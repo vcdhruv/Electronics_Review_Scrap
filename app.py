@@ -85,10 +85,8 @@ def review():
             logging.info(f"review list length : {len(reviews_list)}")
             # logging.info(f"review list 2 : {rl}")
 
-            try:
-                if not os.path.exists('CSV_Files'):
-                    os.mkdir('CSV_Files')    
-                f = open(f"CSV_Files/{user_searched}.csv","w",encoding="utf-8")
+            try:  
+                f = open(f"{user_searched}.csv","w",encoding="utf-8")
                 f.write("Name,Ratings,Comment,Descriptions\n")
             except Exception as e:
                 logging.error(e)
