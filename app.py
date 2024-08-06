@@ -18,8 +18,11 @@ base_url = "https://www.flipkart.com/search?q="
 
 
 def fetch_with_retry(url):
+    headers = {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+    }
     while True:
-        response = requests.get(url)
+        response = requests.get(url,headers=headers)
         if response.status_code == 429:
             retry_after = int(response.headers.get("Retry-After", 1))
             logging.warning(f"Rate limited. Retrying after {retry_after} seconds.")
