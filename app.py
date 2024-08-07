@@ -1,10 +1,11 @@
+from pymongo.mongo_client import MongoClient
+from pymongo.server_api import ServerApi
 from flask import Flask , render_template , redirect , url_for , request
 import requests
 from bs4 import BeautifulSoup
 import logging
 import time
 import os
-import csv
 
 app = Flask(__name__)
 logging.basicConfig(
@@ -16,13 +17,24 @@ logging.basicConfig(
 site_url = "https://www.flipkart.com"
 base_url = "https://www.flipkart.com/search?q="
 
+uri = "mongodb+srv://vcdhruv:vcd7777777@cluster0.rkvcxnp.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
+
+# Create a new client and connect to the server
+client = MongoClient(uri, server_api=ServerApi('1'))
+
+# Send a ping to confirm a successful connection
+try:
+    client.admin.command('ping')
+    print("Pinged your deployment. You successfully connected to MongoDB!")
+except Exception as e:
+    logging.error(f"Mongo DB Exception occurred : {e}")
+
+db = client['flipkart_review_scrap']
+review_scrap_coll = db["scrap record"]
 
 def fetch_with_retry(url):
-    headers = {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
-    }
     while True:
-        response = requests.get(url,headers=headers)
+        response = requests.get(url)
         if response.status_code == 429:
             retry_after = int(response.headers.get("Retry-After", 1))
             logging.warning(f"Rate limited. Retrying after {retry_after} seconds.")
@@ -49,7 +61,7 @@ def review():
 
             if main_url_res.status_code != 200:
                 logging.error(f"Failed to fetch main url : {main_url}")
-                return "Error : Failed to fetch search results from Flipkart"
+                return "Error : Failed to fetch search results from Flipkart",500
 
             soup = BeautifulSoup(main_url_res.text,"html.parser")
             soup.find_all("div",{"class":"cPHDOP col-12-12"})
@@ -57,7 +69,7 @@ def review():
             bigbox = soup.find_all("div",{"class":"cPHDOP col-12-12"})
             if len(bigbox) < 3:
                 logging.error("Not enough records found on the search page.")
-                return "Error: Not enough products found"
+                return "Error: Not enough products found",404
             
             del bigbox[0:2]
             go_to_particular_page_links = []
@@ -78,16 +90,20 @@ def review():
             # logging.info(f"Response of {product_link} is {product_link_res}")
             if product_link_res.status_code != 200:
                 logging.error(f"Failed to fetch product page : {product_link}")
-                return "Error : Failed to fetch product page"
+                return "Error : Failed to fetch product page",500
             
                         
             mobile_soup = BeautifulSoup(product_link_res.text,"html.parser")
 
             reviews_list = mobile_soup.find_all("div",{"class":"col EPCmJX"})
+            # reviews_list = mobile_soup.find_all(lambda tag: tag.name == 'div' and tag.get('class') and any('EPCmJX' in c for c in tag['class']))
             logging.info(f"review list length : {len(reviews_list)}")
+            # logging.info(f"review list 2 : {rl}")
 
-            try:  
-                f = open(f"{user_searched}.csv","w",encoding="utf-8")
+            try:
+                if not os.path.exists('CSV_Files'):
+                    os.mkdir('CSV_Files')    
+                f = open(f"CSV_Files/{user_searched}.csv","w",encoding="utf-8")
                 f.write("Name,Ratings,Comment,Descriptions\n")
             except Exception as e:
                 logging.error(e)
@@ -122,18 +138,25 @@ def review():
                 except:
                     logging.warning("Description not found")
                 
-                
                 logging.info(f"Appending to result : {review}")
                 final_reviews_list.append(review)
 
+            logging.info(f"Final Review List To Be Added : {final_reviews_list}")
+            
             logging.info("exporing data to csv file locally")
             for i in final_reviews_list:
                 f.write(i["Name"]+",")
                 f.write(i["Ratings"]+",")
                 f.write(i["Comment"]+",")
                 f.write(i["Description"]+"\n")
-            logging.info(f"Final Review List To Be Added : {final_reviews_list}")
-            
+
+            try:
+                logging.info("Trying to add data to mongo db.")
+                review_scrap_coll.insert_many(final_reviews_list)
+            except Exception as e:
+                logging.error(f"Error Occured While INserting data to mongo db : {e}")
+            else:
+                logging.info("Data Successfully added to Mongo DB")
                 
             return render_template('results.html',results = final_reviews_list)
         except Exception as e:
@@ -144,4 +167,4 @@ def review():
                 logging.info("file is closed successfully")
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0")
+    app.run(debug=True)
