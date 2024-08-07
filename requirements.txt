@@ -3,3 +3,4 @@ ipykernel
 flask
 requests
 pymongo
+gunicorn
