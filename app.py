@@ -20,20 +20,20 @@ logging.basicConfig(
 site_url = "https://www.flipkart.com"
 base_url = "https://www.flipkart.com/search?q="
 
-uri = "mongodb+srv://vcdhruv:vcd7777777@cluster0.rkvcxnp.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
+# uri = "mongodb+srv://vcdhruv:vcd7777777@cluster0.rkvcxnp.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
 
-# Create a new client and connect to the server
-client = MongoClient(uri, server_api=ServerApi('1'))
+# # Create a new client and connect to the server
+# client = MongoClient(uri, server_api=ServerApi('1'))
 
-# Send a ping to confirm a successful connection
-try:
-    client.admin.command('ping')
-    print("Pinged your deployment. You successfully connected to MongoDB!")
-except Exception as e:
-    logging.error(f"Mongo DB Exception occurred : {e}")
+# # Send a ping to confirm a successful connection
+# try:
+#     client.admin.command('ping')
+#     print("Pinged your deployment. You successfully connected to MongoDB!")
+# except Exception as e:
+#     logging.error(f"Mongo DB Exception occurred : {e}")
 
-db = client['flipkart_review_scrap']
-review_scrap_coll = db["scrap record"]
+# db = client['flipkart_review_scrap']
+# review_scrap_coll = db["scrap record"]
 
 def fetch_with_retry(url):
     while True:
@@ -54,7 +54,7 @@ def index_page():
 def review():
     if request.method == 'POST':
         try:
-            f = None
+            # f = None
             user_searched = request.form["search"]
             search_string = user_searched.replace(" ","")
             logging.info(f"User searched {search_string}")
@@ -113,15 +113,15 @@ def review():
             print(f"review list length : {len(reviews_list)}")
             # logging.info(f"review list 2 : {rl}")
 
-            try:
-                if not os.path.exists('CSV_Files'):
-                    os.mkdir('CSV_Files')    
-                f = open(f"CSV_Files/{user_searched}.csv","w",encoding="utf-8")
-                f.write("Name,Ratings,Comment,Descriptions\n")
-            except Exception as e:
-                logging.error(e)
-                print(f"Error occurred while writing to file : {e}")
-                return None
+            # try:
+                # if not os.path.exists('CSV_Files'):
+                    # os.mkdir('CSV_Files')    
+                # f = open(f"CSV_Files/{user_searched}.csv","w",encoding="utf-8")
+                # f.write("Name,Ratings,Comment,Descriptions\n")
+            # except Exception as e:
+                # logging.error(e)
+                # print(f"Error occurred while writing to file : {e}")
+                # return None
             final_reviews_list = []
             for i in reviews_list:
                 review = {
@@ -163,34 +163,34 @@ def review():
             logging.info(f"Final Review List To Be Added : {final_reviews_list}")
             print(f"Final Review List To Be Added : {final_reviews_list}")
             
-            logging.info("exporing data to csv file locally")
-            print("exporing data to csv file locally")
-            for i in final_reviews_list:
-                f.write(i["Name"]+",")
-                f.write(i["Ratings"]+",")
-                f.write(i["Comment"]+",")
-                f.write(i["Description"]+"\n")
+            # logging.info("exporing data to csv file locally")
+            # print("exporing data to csv file locally")
+            # for i in final_reviews_list:
+                # f.write(i["Name"]+",")
+                # f.write(i["Ratings"]+",")
+                # f.write(i["Comment"]+",")
+                # f.write(i["Description"]+"\n")
 
-            try:
-                logging.info("Trying to add data to mongo db.")
-                print("Trying to add data to mongo db")
-                review_scrap_coll.insert_many(final_reviews_list)
-            except Exception as e:
-                logging.error(f"Error Occured While INserting data to mongo db : {e}")
-                print("Error Occured while inserting data to mongo : {e}");
-            else:
-                logging.info("Data Successfully added to Mongo DB")
-                print("Data Successfully added to Mongo DB")
+            # try:
+            #     logging.info("Trying to add data to mongo db.")
+            #     print("Trying to add data to mongo db")
+            #     review_scrap_coll.insert_many(final_reviews_list)
+            # except Exception as e:
+            #     logging.error(f"Error Occured While INserting data to mongo db : {e}")
+            #     print("Error Occured while inserting data to mongo : {e}");
+            # else:
+            #     logging.info("Data Successfully added to Mongo DB")
+            #     print("Data Successfully added to Mongo DB")
                 
             return render_template('results.html',results = final_reviews_list)
         except Exception as e:
             logging.error(e)
             print("Error Occured somewhere in between : {e}")
-        finally:
-            if f is not None:
-                f.close()
-                logging.info("file is closed successfully")
-                print("File is closed successfully")
+        # finally:
+        #     if f is not None:
+        #         f.close()
+        #         logging.info("file is closed successfully")
+        #         print("File is closed successfully")
 
 if __name__ == "__main__":
     app.run(debug=True)
