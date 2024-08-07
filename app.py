@@ -38,7 +38,7 @@ review_scrap_coll = db["scrap record"]
 def fetch_with_retry(url):
     while True:
         response = requests.get(url)
-        if response.status_code == 429:
+        if response.status_code != 200:
             retry_after = int(response.headers.get("Retry-After", 1))
             logging.warning(f"Rate limited. Retrying after {retry_after} seconds.")
             print(f"Retrying after {retry_after} seconds")
