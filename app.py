@@ -1,6 +1,7 @@
 from pymongo.mongo_client import MongoClient
 from pymongo.server_api import ServerApi
-from flask import Flask , render_template , redirect , url_for , request
+from flask import Flask , render_template , request
+from flask_cors import CORS
 import requests
 from bs4 import BeautifulSoup
 import logging
@@ -8,6 +9,8 @@ import time
 import os
 
 app = Flask(__name__)
+CORS(app=app)
+
 logging.basicConfig(
     filename="scrapper.log",
     level=logging.DEBUG,
@@ -129,25 +132,25 @@ def review():
                 }
 
                 try:
-                    review["Name"] = i.find("div",{"class":"row gHqwa8"}).div.p.text
+                    review["Name"] = str(i.find("div",{"class":"row gHqwa8"}).div.p.text)
                 except:
                     logging.warning("Name not found")
                     print(f"Name not found")
                 
                 try:
-                    review["Ratings"] = i.div.div.text
+                    review["Ratings"] = str(i.div.div.text)
                 except:
                     logging.warning("Ratings not found")
                     print(f"Ratings not found")
                 
                 try:
-                    review["Comment"] = i.div.p.text
+                    review["Comment"] = str(i.div.p.text)
                 except:
                     logging.warning("Comment not found")
                     print(f"Comment not found")
                 
                 try:
-                    review["Description"] =  i.find("div",{"class":"ZmyHeo"}).div.div.text
+                    review["Description"] =  str(i.find("div",{"class":"ZmyHeo"}).div.div.text)
                 except:
                     logging.warning("Description not found")
                     print("Description not found")
