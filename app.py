@@ -18,6 +18,7 @@ logging.basicConfig(
 )
 site_url = "https://www.flipkart.com"
 base_url = "https://www.flipkart.com/search?q="
+headers={"User-Agent": "Mozilla/5.0 (X11; CrOS x86_64 12871.102.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.141 Safari/537.36"}
 
 # uri = "mongodb+srv://vcdhruv:vcd7777777@cluster0.rkvcxnp.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
 
@@ -60,7 +61,7 @@ def review():
             print(f"User searched {search_string}")
 
             main_url = base_url + search_string
-            main_url_res = requests.get(main_url)
+            main_url_res = requests.get(main_url,headers=headers)
             # logging.info(f"Response of {main_url} is {main_url_res}")
             print(f"Response of {main_url} is {main_url_res}")
             print(f"Status code : {main_url_res.status_code}")
@@ -76,7 +77,7 @@ def review():
             if len(bigbox) < 3:
                 logging.error("Not enough records found on the search page.")
                 print(f"Not enough records found on the search page")
-                return "Error: Not enough products found",404
+                return "Error: Not enough products found"
             
             del bigbox[0:2]
             go_to_particular_page_links = []
