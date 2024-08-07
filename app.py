@@ -2,6 +2,7 @@ from flask import Flask, render_template, request
 import requests
 from bs4 import BeautifulSoup
 import logging
+import time
 
 app = Flask(__name__)
 
@@ -25,12 +26,15 @@ def fetch_with_retry(url):
             elif response.status_code == 429:  # Too Many Requests
                 retry_after = int(response.headers.get("Retry-After", 1))
                 logging.warning(f"Rate limited. Retrying after {retry_after} seconds.")
+                print(f"Retrying after { retry_after} seconds")
                 time.sleep(retry_after)
             else:
                 logging.error(f"Failed to fetch {url} with status code {response.status_code}")
+                print("Failed to fetch {url} with status code {response.status_code}")
                 return response
         except requests.RequestException as e:
             logging.error(f"Request failed: {e}")
+            print(f"Request failed: {e}")
             time.sleep(5)  # Wait before retrying
 
 @app.route('/', methods=['GET'])
