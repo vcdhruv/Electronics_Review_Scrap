@@ -63,11 +63,11 @@ def review():
             main_url = base_url + search_string
             main_url_res = fetch_with_retry(main_url)
             # logging.info(f"Response of {main_url} is {main_url_res}")
-
+            print(f"Status code : {main_url_res.status_code}")
             if main_url_res.status_code != 200:
                 logging.error(f"Failed to fetch main url : {main_url}")
                 print(f"Failed to fetch main url : {main_url}")
-                return "Error : Failed to fetch search results from Flipkart",500
+                return "Error : Failed to fetch search results from Flipkart"
 
             soup = BeautifulSoup(main_url_res.text,"html.parser")
             soup.find_all("div",{"class":"cPHDOP col-12-12"})
