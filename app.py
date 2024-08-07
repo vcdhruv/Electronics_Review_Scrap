@@ -63,6 +63,7 @@ def review():
             main_url = base_url + search_string
             main_url_res = fetch_with_retry(main_url)
             # logging.info(f"Response of {main_url} is {main_url_res}")
+            print(f"Response of {main_url} is {main_url_res}")
             print(f"Status code : {main_url_res.status_code}")
             if main_url_res.status_code != 200:
                 logging.error(f"Failed to fetch main url : {main_url}")
