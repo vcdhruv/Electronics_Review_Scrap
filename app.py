@@ -9,7 +9,6 @@ import time
 import os
 
 app = Flask(__name__)
-CORS(app=app)
 
 logging.basicConfig(
     filename="scrapper.log",
@@ -35,16 +34,16 @@ base_url = "https://www.flipkart.com/search?q="
 # db = client['flipkart_review_scrap']
 # review_scrap_coll = db["scrap record"]
 
-def fetch_with_retry(url):
-    while True:
-        response = requests.get(url)
-        if response.status_code != 200:
-            retry_after = int(response.headers.get("Retry-After", 1))
-            logging.warning(f"Rate limited. Retrying after {retry_after} seconds.")
-            print(f"Retrying after {retry_after} seconds")
-            time.sleep(retry_after)
-        else:
-            return response
+# def fetch_with_retry(url):
+#     while True:
+#         response = requests.get(url)
+#         if response.status_code != 200:
+#             retry_after = int(response.headers.get("Retry-After", 1))
+#             logging.warning(f"Rate limited. Retrying after {retry_after} seconds.")
+#             print(f"Retrying after {retry_after} seconds")
+#             time.sleep(retry_after)
+#         else:
+#             return response
 
 @app.route('/',methods=['GET'])
 def index_page():
@@ -61,7 +60,7 @@ def review():
             print(f"User searched {search_string}")
 
             main_url = base_url + search_string
-            main_url_res = fetch_with_retry(main_url)
+            main_url_res = requests.get(main_url)
             # logging.info(f"Response of {main_url} is {main_url_res}")
             print(f"Response of {main_url} is {main_url_res}")
             print(f"Status code : {main_url_res.status_code}")
@@ -97,7 +96,7 @@ def review():
                 return "<h1>Not Enough Reviews</h1>"
             
             product_link = go_to_particular_page_links[0]
-            product_link_res = fetch_with_retry(product_link)
+            product_link_res = requests.get(product_link)
             # logging.info(f"Response of {product_link} is {product_link_res}")
             if product_link_res.status_code != 200:
                 logging.error(f"Failed to fetch product page : {product_link}")
